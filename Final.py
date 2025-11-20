@@ -6,9 +6,10 @@ from datetime import datetime
 import plotly.graph_objects as go
 import plotly.express as px
 import streamlit as st
-import openai
+from openai import OpenAI
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 
 
 # ───────────────── Configuración de página ─────────────────
@@ -1244,7 +1245,7 @@ user_input = st.text_input("Hazme una pregunta:")
 
 if user_input:
     try:
-        resp = openai.chat.completions.create(
+        resp = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": user_input}]
         )
