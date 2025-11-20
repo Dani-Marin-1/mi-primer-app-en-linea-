@@ -1238,13 +1238,22 @@ st.markdown(
 )
 ########################################################################################################
 
+########################################################################################################
+
+# Inicializar cliente moderno
+client = openai.OpenAI()
+
 st.subheader("Asistente IA")
 
 user_input = st.text_input("Hazme una pregunta:")
 
 if user_input:
-    resp = openai.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": user_input}]
-    )
-    st.write(resp.choices[0].message["content"])
+    try:
+        resp = client.responses.create(
+            model="gpt-4o-mini",
+            input=user_input
+        )
+        st.write(resp.output_text)
+    except Exception as e:
+        st.error("Hubo un error al procesar la respuesta. Intenta nuevamente.")
+
