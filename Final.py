@@ -5,12 +5,9 @@ import numpy as np
 from datetime import datetime
 import plotly.graph_objects as go
 import plotly.express as px
-import streamlit as st
-from openai import OpenAI
+import openai
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
-
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # ───────────────── Configuración de página ─────────────────
 st.set_page_config(
@@ -34,201 +31,138 @@ st.markdown("""
         background-color: #F8F9FA !important;
     }
     
-    /* Títulos y texto - CAMBIO: Azul más profesional y gris */
+    /* Títulos */
     h1, h2, h3, h4, h5, h6 {
-        color: #2C3E50 !important;  /* Azul grisáceo más profesional */
+        color: #2C3E50 !important;
         font-family: 'Arial', sans-serif;
     }
-    
+
     .stMarkdown {
-        color: #34495E !important;  /* Gris azulado más profesional */
+        color: #34495E !important;
     }
-    
-    /* Métricas - CAMBIO: Azul más fuerte */
+
+    /* Métricas */
     [data-testid="metric-container"] {
         background-color: #F8F9FA;
         border: 1px solid #E0E0E0;
         border-radius: 10px;
         padding: 15px;
     }
-    
+
     [data-testid="metric-label"] {
-        color: #7F8C8D !important;  /* Gris más profesional */
+        color: #7F8C8D !important;
         font-size: 14px !important;
     }
-    
+
     [data-testid="metric-value"] {
-        color: #2980B9 !important;  /* Azul más fuerte y profesional */
+        color: #2980B9 !important;
         font-size: 24px !important;
         font-weight: bold;
     }
-    
-    [data-testid="metric-delta"] {
-        font-size: 14px !important;
-    }
-    
-    /* Tabs - CAMBIO: Azul más profesional */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    
+
+    /* Tabs */
     .stTabs [data-baseweb="tab"] {
         background-color: #F8F9FA;
         border-radius: 8px 8px 0px 0px;
         padding: 10px 20px;
-        color: #7F8C8D;  /* Gris profesional */
+        color: #7F8C8D;
         border: 1px solid #E0E0E0;
     }
-    
+
     .stTabs [aria-selected="true"] {
-        background-color: #2980B9 !important;  /* Azul más fuerte */
+        background-color: #2980B9 !important;
         color: #FFFFFF !important;
         font-weight: bold;
-    }
-    
-    /* Inputs */
-    .stTextInput>div>div>input {
-        background-color: #FFFFFF;
-        color: #000000;
-        border: 1px solid #BDC3C7;  /* Gris más profesional */
-    }
-    
-    .stSelectbox>div>div {
-        background-color: #FFFFFF;
-        color: #000000;
-        border: 1px solid #BDC3C7;  /* Gris más profesional */
-    }
-    
-    .stTextArea>div>div>textarea {
-        background-color: #FFFFFF;
-        color: #000000;
-        border: 1px solid #BDC3C7;  /* Gris más profesional */
-    }
-    
-    /* Dataframes - CAMBIO: Azul más profesional */
-    .dataframe {
-        background-color: #FFFFFF !important;
-        color: #000000 !important;
-    }
-    
-    .dataframe th {
-        background-color: #34495E !important;  /* Azul grisáceo profesional */
-        color: #FFFFFF !important;
-        font-weight: bold;
-    }
-    
-    .dataframe td {
-        background-color: #F8F9FA !important;
-        color: #000000 !important;
-    }
-    
-    /* Botones y controles - CAMBIO: Azul más fuerte */
-    .stButton>button {
-        background-color: #2980B9;  /* Azul más fuerte */
-        color: #FFFFFF;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-    }
-    
-    .stButton>button:hover {
-        background-color: #2471A3;  /* Azul más oscuro al hover */
-        color: #FFFFFF;
-    }
-    
-    /* Info boxes - CAMBIO: Tonos más profesionales */
-    .stInfo {
-        background-color: #EBF5FB;
-        border: 1px solid #3498DB;
-        color: #2471A3;
-    }
-    
-    .stWarning {
-        background-color: #FEF9E7;
-        border: 1px solid #F39C12;
-        color: #B7950B;
-    }
-    
-    .stError {
-        background-color: #FDEDEC;
-        border: 1px solid #E74C3C;
-        color: #A93226;
-    }
-    
-    .stSuccess {
-        background-color: #E8F5E8;
-        border: 1px solid #27AE60;
-        color: #229954;
-    }
-    
-    /* Separadores */
-    hr {
-        border-color: #BDC3C7;  /* Gris más profesional */
-        margin: 20px 0;
-    }
-    
-    /* Cards personalizadas */
-    .custom-card {
-        background-color: #F8F9FA;
-        border: 1px solid #BDC3C7;  /* Gris más profesional */
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px 0;
-    }
-    
-    /* Texto en sidebar */
-    .css-1aumxhk {
-        color: #2C3E50 !important;  /* Gris azulado profesional */
-    }
-    
-    /* Tabla de comparación */
-    .comparison-table {
-        background-color: #FFFFFF;
-        border-radius: 10px;
-        padding: 15px;
-        margin: 10px 0;
-        border: 1px solid #E0E0E0;
-    }
-    
-    .comparison-header {
-        background-color: #34495E !important;
-        color: #FFFFFF !important;
-        font-weight: bold !important;
-    }
-    
-    .comparison-cell {
-        text-align: center !important;
-        padding: 10px !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
+# ───────────────── Título ─────────────────
 st.title("📈 Análisis Financiero ")
 st.markdown("---")
 
-# ───────────────── Sidebar ─────────────────
-with st.sidebar:
-    st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.header("🎯 Controles Principales")
-    stonk = st.text_input("**Símbolo de la Acción (ticker):**", value="JNJ").upper()
+# ───────────────── Periodos ─────────────────
+PERIODO_YF = {
+    "1M": "1mo", "3M": "3mo", "6M": "6mo",
+    "1A": "1y", "3A": "3y", "5A": "5y", "Máximo": "max"
+}
 
-    st.subheader("📊 Período histórico")
+# ───────────────── SIDEBAR (MOVIDA AQUÍ) ─────────────────
+with st.sidebar:
+
+    st.markdown("## 🎛️ Panel de Control")
+    st.markdown("---")
+
+    # Búsqueda
+    st.markdown("### 🔎 Búsqueda de Ticker")
+    stonk = st.text_input("Símbolo:", value="JNJ").upper()
+
+    st.markdown("---")
+
+    # Período
+    st.markdown("### ⏳ Período de Análisis")
     periodo_historico = st.selectbox(
-        "**Período Histórico:**",
+        "Selecciona el período:",
         ["1M", "3M", "6M", "1A", "3A", "5A", "Máximo"],
         index=3
     )
 
-    st.subheader("🔍 Comparación de Empresas")
+    st.markdown("---")
+
+    # Comparación
+    st.markdown("### 📊 Comparación de Empresas")
     tickers_comparacion = st.text_area(
-        "**Símbolos para comparar (separados por coma):**",
+        "Tickers separados por coma:",
         "AAPL, MSFT, GOOGL, AMZN"
     )
     comparacion_tickers = [t.strip().upper() for t in tickers_comparacion.split(",") if t.strip()]
-    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("---")
-    st.info("💡 Usa tickers válidos (ej. SPY, AAPL, TSLA, MSFT).")
+
+    # Accesos rápidos
+    st.markdown("### ⭐ Accesos Rápidos")
+    ticker_fav = st.selectbox(
+        "Seleccionar empresa rápida:",
+        ["—", "AAPL", "NVDA", "TSLA", "MSFT", "META"]
+    )
+
+    if ticker_fav != "—":
+        st.session_state["quick_ticker"] = ticker_fav
+        stonk = ticker_fav
+        st.success(f"Ticker cambiado a {ticker_fav}")
+
+    st.markdown("---")
+
+    # Datos rápidos
+    st.markdown("### 📈 Datos Rápidos")
+    try:
+        df_temp = yf.Ticker(stonk).history(period="1y")
+        precio_temp = df_temp["Close"].iloc[-1]
+        st.metric("Precio Actual", f"${precio_temp:.2f}")
+    except:
+        st.metric("Precio Actual", "—")
+
+    st.markdown("---")
+
+    # Tema visual
+    st.markdown("### 🎨 Tema")
+    tema = st.selectbox("Tema visual:", ["Claro", "Oscuro"])
+    if tema == "Oscuro":
+        st.markdown("<style>.stApp { background-color: #0E1117; color: white; }</style>", unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Refrescar
+    if st.button("🔄 Actualizar Datos"):
+        st.experimental_rerun()
+
+    st.markdown("---")
+
+    st.info("Herramienta profesional para análisis financiero, comparación de empresas y evaluación de riesgo.")
+
+
+
+
 
 # ───────────────── Utilidades ─────────────────
 PERIODO_YF = {
@@ -1238,14 +1172,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 ########################################################################################################
-
 st.subheader("Asistente IA")
 
 user_input = st.text_input("Hazme una pregunta:")
 
 if user_input:
     try:
-        resp = client.chat.completions.create(
+        resp = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": user_input}]
         )
@@ -1254,5 +1187,3 @@ if user_input:
 
     except Exception as e:
         st.error("Hubo un error al procesar la respuesta. Intenta nuevamente.")
-
-
