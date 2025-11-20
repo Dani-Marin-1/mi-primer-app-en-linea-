@@ -1250,7 +1250,7 @@ user_input = st.text_input("Hazme una pregunta:")
 if user_input:
     try:
         resp = client.responses.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             input=user_input
         )
         st.write(resp.output_text)
