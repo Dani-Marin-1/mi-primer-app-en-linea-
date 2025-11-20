@@ -5,6 +5,11 @@ import numpy as np
 from datetime import datetime
 import plotly.graph_objects as go
 import plotly.express as px
+import streamlit as st
+import openai
+
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+
 
 # ───────────────── Configuración de página ─────────────────
 st.set_page_config(
@@ -1231,3 +1236,15 @@ st.markdown(
     "</div>", 
     unsafe_allow_html=True
 )
+########################################################################################################
+
+st.subheader("Asistente IA")
+
+user_input = st.text_input("Hazme una pregunta:")
+
+if user_input:
+    resp = openai.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": user_input}]
+    )
+    st.write(resp.choices[0].message["content"])
